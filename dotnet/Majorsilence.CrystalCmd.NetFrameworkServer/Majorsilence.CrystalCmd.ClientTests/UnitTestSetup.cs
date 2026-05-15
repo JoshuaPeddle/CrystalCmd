@@ -70,7 +70,7 @@ namespace Majorsilence.CrystalCmd.ClientTests
             _serverProcess = new System.Diagnostics.Process();
             _serverProcess.StartInfo.FileName = "dotnet";
             _serverProcess.StartInfo.Arguments = "Majorsilence.CrystalCmd.Server.dll";
-            _serverProcess.StartInfo.EnvironmentVariables["ASPNETCORE_URLS"] = "http://localhost:44355;https://localhost:44356";
+            _serverProcess.StartInfo.EnvironmentVariables["ASPNETCORE_URLS"] = "http://localhost:44355";
             _serverProcess.StartInfo.WorkingDirectory = System.IO.Path.Combine(baseDir, 
                 "Majorsilence.CrystalCmd.Server",
                 "bin",
@@ -104,11 +104,32 @@ namespace Majorsilence.CrystalCmd.ClientTests
 
             await Task.Delay(5000); // Wait for server to start
 
-            // ping the server to see if it's online
             using (var client = new System.Net.Http.HttpClient())
             {
-                var response = await client.GetAsync("http://localhost:44355/healthz/ready");
-                Assert.That(response.IsSuccessStatusCode, "Server is not online.");
+                var deadline = DateTime.UtcNow.AddSeconds(60);
+                bool ready = false;
+                while (DateTime.UtcNow < deadline)
+                {
+                    if (_serverProcess.HasExited)
+                    {
+                        Assert.Fail($"Server process exited prematurely with code {_serverProcess.ExitCode}.");
+                    }
+                    try
+                    {
+                        var response = await client.GetAsync("http://localhost:44355/healthz/ready");
+                        if (response.IsSuccessStatusCode)
+                        {
+                            ready = true;
+                            break;
+                        }
+                    }
+                    catch (System.Net.Http.HttpRequestException)
+                    {
+                        // not up yet
+                    }
+                    await Task.Delay(500);
+                }
+                Assert.That(ready, "Server did not come online within 60 seconds.");
             }
         }
 
