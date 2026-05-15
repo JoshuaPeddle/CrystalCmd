@@ -24,6 +24,8 @@ namespace Majorsilence.CrystalCmd.ClientTests
             string configuration = "Release";
 #endif
 
+            Directory.CreateDirectory(@"C:\CrystalCmd");
+
             string currentWorkingDir = System.IO.Directory.GetCurrentDirectory();
             string baseDir = System.IO.Path.GetFullPath(System.IO.Path.Combine(currentWorkingDir, @"..\..\..\.."));
 
