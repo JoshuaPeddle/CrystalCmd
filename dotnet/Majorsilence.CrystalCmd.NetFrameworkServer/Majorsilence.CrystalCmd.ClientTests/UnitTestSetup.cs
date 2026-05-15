@@ -70,7 +70,7 @@ namespace Majorsilence.CrystalCmd.ClientTests
             _serverProcess = new System.Diagnostics.Process();
             _serverProcess.StartInfo.FileName = "dotnet";
             _serverProcess.StartInfo.Arguments = "Majorsilence.CrystalCmd.Server.dll";
-            _serverProcess.StartInfo.EnvironmentVariables["ASPNETCORE_URLS"] = "http://*:44355;https://*:44356";
+            _serverProcess.StartInfo.EnvironmentVariables["ASPNETCORE_URLS"] = "http://localhost:44355;https://localhost:44356";
             _serverProcess.StartInfo.WorkingDirectory = System.IO.Path.Combine(baseDir, 
                 "Majorsilence.CrystalCmd.Server",
                 "bin",
